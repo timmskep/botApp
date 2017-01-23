@@ -16,7 +16,7 @@ package utils
 			var myImage:Image = new Image(Texture.fromEmbeddedAsset(myAsset));
 			myImage.pixelSnapping = true;
 			myImage.textureSmoothing = TextureSmoothing.TRILINEAR;
-			myImage.scale9Grid = new Rectangle(25, 25, 1, 1);
+			myImage.scale9Grid = new Rectangle(45, 45, 1, 1);
 			myImage.color = color;
 			return myImage;
 		}

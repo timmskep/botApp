@@ -12,8 +12,10 @@ package screens
 	import feathers.layout.HorizontalLayout;
 
 	import flash.events.Event;
+	import flash.events.IOErrorEvent;
 	import flash.net.URLLoader;
 	import flash.net.URLRequest;
+	import flash.net.URLRequestMethod;
 
 	import starling.display.DisplayObject;
 	import starling.events.Event;
@@ -84,6 +86,7 @@ package screens
 
 			questionsList = new List();
 			questionsList.addEventListener("go-next", showNextQuestion);
+			questionsList.addEventListener("submit-answer", logAnswer);
 			questionsList.dataProvider = new ListCollection(questionsArray);
 			questionsList.layout = layoutForList;
 			questionsList.hasElasticEdges = false;
@@ -98,6 +101,37 @@ package screens
 		{
 			currentQuestion++;
 			questionsList.scrollToPageIndex(currentQuestion, 0, 1);
+		}
+
+		private function logAnswer(event:starling.events.Event):void
+		{
+			var myObject:Object = new Object();
+			myObject.question_id = event.data.questionId;
+			myObject.correct_answer = event.data.correctAnswer;
+			myObject.user_id = Constants.LOGGED_USER_DATA.user_id;
+			myObject.timestamp = new Date().getTime();
+
+			var request:URLRequest = new URLRequest(Constants.FIREBASE_USER_STATS_URL + Constants.LOGGED_USER_DATA.user_id +
+					".json" + "?auth=" + Constants.FIREBASE_AUTH_TOKEN);
+			request.data = JSON.stringify(myObject);
+			request.method = URLRequestMethod.POST;
+
+			var loader:URLLoader = new URLLoader();
+			loader.addEventListener(flash.events.Event.COMPLETE, answerSent);
+			loader.addEventListener(IOErrorEvent.IO_ERROR, errorHandler);
+			loader.load(request);
+		}
+
+		private function answerSent(event:flash.events.Event):void
+		{
+			event.currentTarget.removeEventListener(flash.events.Event.COMPLETE, answerSent);
+			trace(event.currentTarget.data);
+		}
+
+		private function errorHandler(event:IOErrorEvent):void
+		{
+			event.currentTarget.removeEventListener(IOErrorEvent.IO_ERROR, errorHandler);
+			trace(event.currentTarget.data);
 		}
 
 	}
