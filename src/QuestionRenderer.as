@@ -22,11 +22,19 @@ package
 
 	public class QuestionRenderer extends LayoutGroupListItemRenderer
 	{
+		private static const RED:uint = 0xDB3340;
+		private static const GREEN:uint = 0x33DB7A;
+		private static const BLUE:uint = 0x3394DB;
+
+		private var selectedAnswer:Boolean; //True is Bot, False is Not Bot
 		private var questionTextLabel:Label;
 		private var botLabel:Label;
 		private var sourceGroup:LayoutGroup;
 		private var sourceLabel:Label;
 		private var grayOVerlay:BasicButton;
+		private var botButton:Button;
+		private var notbotButton:Button;
+		private var infoButton:Button;
 
 		public function QuestionRenderer()
 		{
@@ -52,12 +60,13 @@ package
 			 */
 			var textGroup:LayoutGroup = new LayoutGroup();
 			textGroup.layout = new AnchorLayout();
-			textGroup.layoutData = new VerticalLayoutData(100, 100);
+			textGroup.layoutData = new VerticalLayoutData(90, 100);
+			textGroup.backgroundSkin = RoundedRect.createRoundedRect(0xCCCCCC);
 			this.addChild(textGroup);
 
 			questionTextLabel = new Label();
 			questionTextLabel.layoutData = new AnchorLayoutData(20, 20, 20, 20);
-			questionTextLabel.fontStyles = new TextFormat("_sans", 18, 0x000000);
+			questionTextLabel.fontStyles = new TextFormat("Rubik", 18, 0x000000);
 			questionTextLabel.fontStyles.leading = 7;
 			questionTextLabel.wordWrap = true;
 			textGroup.addChild(questionTextLabel);
@@ -72,12 +81,13 @@ package
 			this.addChild(sourceGroup);
 
 			botLabel = new Label();
-			botLabel.fontStyles = new TextFormat("_sans", 30, 0x000000);
+			botLabel.fontStyles = new TextFormat("Rubik", 30, 0x000000);
+			botLabel.fontStyles.leading = 3;
 			botLabel.layoutData = new AnchorLayoutData(10, NaN, NaN, NaN, 0, NaN);
 			sourceGroup.addChild(botLabel);
 
 			sourceLabel = new Label();
-			sourceLabel.fontStyles = new TextFormat("_sans", 18, 0x000000);
+			sourceLabel.fontStyles = new TextFormat("Rubik", 18, 0x000000);
 			sourceLabel.fontStyles.leading = 3;
 			sourceLabel.layoutData = new AnchorLayoutData(NaN, 10, 10, 10, 0, NaN);
 			sourceLabel.wordWrap = true;
@@ -87,7 +97,7 @@ package
 			infoIcon.source = "assets/icons/info.png";
 			infoIcon.width = infoIcon.height = 30;
 
-			var infoButton:Button = new Button();
+			infoButton = new Button();
 			infoButton.addEventListener(Event.TRIGGERED, showSourceDetails);
 			infoButton.defaultIcon = infoIcon;
 			infoButton.layoutData = new AnchorLayoutData(10, 10, NaN, NaN);
@@ -95,7 +105,7 @@ package
 
 			grayOVerlay = new BasicButton();
 			grayOVerlay.layoutData = new AnchorLayoutData(0, 0, 0, 0);
-			grayOVerlay.defaultSkin = RoundedRect.createRoundedRect(0xCCCCCCC);
+			grayOVerlay.defaultSkin = RoundedRect.createRoundedRect(0xCCCCCC);
 			sourceGroup.addChild(grayOVerlay);
 
 			/*
@@ -115,8 +125,12 @@ package
 			botIcon.source = "assets/icons/bot.png";
 			botIcon.width = botIcon.height = 70;
 
-			var botButton:Button = new Button();
-			botButton.addEventListener(Event.TRIGGERED, revealAnswer);
+			botButton = new Button();
+			botButton.addEventListener(Event.TRIGGERED, function ():void
+			{
+				selectedAnswer = true;
+				revealAnswer();
+			});
 			botButton.defaultIcon = botIcon;
 			bottomGroup.addChild(botButton);
 
@@ -138,8 +152,12 @@ package
 			notbotIcon.source = "assets/icons/notbot.png";
 			notbotIcon.width = notbotIcon.height = 70;
 
-			var notbotButton:Button = new Button();
-			notbotButton.addEventListener(Event.TRIGGERED, revealAnswer);
+			notbotButton = new Button();
+			notbotButton.addEventListener(Event.TRIGGERED, function ():void
+			{
+				selectedAnswer = false;
+				revealAnswer();
+			});
 			notbotButton.defaultIcon = notbotIcon;
 			bottomGroup.addChild(notbotButton);
 
@@ -154,29 +172,66 @@ package
 			questionTextLabel.text = _data.source;
 		}
 
-		private function revealAnswer(event:Event):void
+		private function revealAnswer():void
 		{
+			botButton.isEnabled = false;
+			notbotButton.isEnabled = false;
+
 			grayOVerlay.visible = false;
+			infoButton.visible = true;
+
+			if (selectedAnswer === _data.bot) {
+
+				botLabel.fontStyles.color = BLUE;
+				sourceLabel.fontStyles.color = BLUE;
+				sourceGroup.backgroundSkin = RoundedRect.createRoundedRect(BLUE);
+
+				var correctAnswerEvent:Event = new Event("submit-answer", true, {questionId: _data.id, correctAnswer:true});
+				dispatchEvent(correctAnswerEvent);
+
+			} else {
+
+				if (_data.bot === true) {
+					botLabel.text = "BOT";
+					botLabel.fontStyles.color = GREEN;
+					sourceLabel.fontStyles.color = GREEN;
+					sourceGroup.backgroundSkin = RoundedRect.createRoundedRect(GREEN);
+				} else {
+					botLabel.text = "NOT";
+					botLabel.fontStyles.color = RED;
+					sourceLabel.fontStyles.color = RED;
+					sourceGroup.backgroundSkin = RoundedRect.createRoundedRect(RED);
+				}
+
+				var incorrectAnswerEvent:Event = new Event("submit-answer", true, {questionId: _data.id, correctAnswer:false});
+				dispatchEvent(incorrectAnswerEvent);
+
+			}
+
 		}
 
 		override protected function commitData():void
 		{
 			if (this._data && this._owner) {
+				
+				botButton.isEnabled = true;
+				notbotButton.isEnabled = true;
 
+				/*
+				We reset everything to white
+				 */
+				infoButton.visible = false;
+				botLabel.fontStyles.color = 0xFFFFFF;
+				sourceLabel.fontStyles.color = 0xFFFFFF;
+				sourceGroup.backgroundSkin = RoundedRect.createRoundedRect(0xFFFFFF);
 				grayOVerlay.visible = true;
 				questionTextLabel.text = '"<i>' + _data.text + '"</i>';
 				sourceLabel.text = _data.source_short;
 
 				if (_data.bot === true) {
 					botLabel.text = "BOT";
-					botLabel.fontStyles.color = 0x3DCF8A;
-					sourceLabel.fontStyles.color = 0x3DCF8A;
-					sourceGroup.backgroundSkin = RoundedRect.createRoundedRect(0xE8FAF1);
 				} else {
 					botLabel.text = "NOT";
-					botLabel.fontStyles.color = 0xE55B50;
-					sourceLabel.fontStyles.color = 0xE55B50;
-					sourceGroup.backgroundSkin = RoundedRect.createRoundedRect(0xF8D7D5);
 				}
 
 			} else {

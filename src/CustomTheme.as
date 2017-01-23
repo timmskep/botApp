@@ -14,6 +14,11 @@ package
 
 	public class CustomTheme extends StyleNameFunctionTheme
 	{
+		[Embed(source="assets/fonts/Rubik-Regular.ttf", fontFamily="Rubik", fontWeight="normal", fontStyle="normal", mimeType="application/x-font", embedAsCFF="false")]
+		private static const RUBIK_FONT:Class;
+
+		[Embed(source="assets/fonts/Play-Regular.ttf", fontFamily="Play", fontWeight="normal", fontStyle="normal", mimeType="application/x-font", embedAsCFF="false")]
+		private static const PLAY_FONT:Class;
 
 		public function CustomTheme()
 		{
@@ -77,7 +82,7 @@ package
 		{
 			var skin:Quad = new Quad(3, 50, 0xFFFFFF);
 			header.backgroundSkin = skin;
-			header.fontStyles = new TextFormat("_sans", 20, 0x000000, "left");
+			header.fontStyles = new TextFormat("Play", 20, 0x3394DB);
 			header.gap = 5;
 			header.paddingLeft = header.paddingRight = 2;
 		}
