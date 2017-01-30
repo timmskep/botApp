@@ -2,6 +2,7 @@ package
 {
 	import feathers.controls.Button;
 	import feathers.controls.Header;
+	import feathers.controls.ImageLoader;
 	import feathers.controls.Label;
 	import feathers.controls.PanelScreen;
 	import feathers.controls.text.TextFieldTextRenderer;
@@ -11,6 +12,8 @@ package
 
 	import starling.display.Quad;
 	import starling.text.TextFormat;
+
+	import utils.EmbeddedAssets;
 
 	public class CustomTheme extends StyleNameFunctionTheme
 	{
@@ -54,7 +57,9 @@ package
 		 */
 		private function initializeStyleProviders():void
 		{
+			this.getStyleProviderForClass(Button).setFunctionForStyleName("back-button", this.setBackButtonStyles);
 			this.getStyleProviderForClass(Button).setFunctionForStyleName("header-button", this.setHeaderButtonStyles);
+			this.getStyleProviderForClass(Button).setFunctionForStyleName("menu-button", this.setMenuButtonStyles);
 
 			this.getStyleProviderForClass(Header).defaultStyleFunction = this.setHeaderStyles;
 			this.getStyleProviderForClass(Label).defaultStyleFunction = this.setLabelStyles;
@@ -65,6 +70,22 @@ package
 		// Button
 		//-------------------------
 
+		private function setBackButtonStyles(button:Button):void
+		{
+			var backButtonIcon:ImageLoader = new ImageLoader();
+			backButtonIcon.source = "assets/icons/back.png";
+			backButtonIcon.height = backButtonIcon.width = 25;
+			backButtonIcon.color = 0x000000;
+
+			button.defaultIcon = backButtonIcon;
+
+			var quad:Quad = new Quad(45, 45, 0xFFFFFF);
+			quad.alpha = .3;
+
+			button.downSkin = quad;
+			button.height = button.width = 45;
+		}
+
 		private function setHeaderButtonStyles(button:Button):void
 		{
 			var quad:Quad = new Quad(45, 45, 0xFFFFFF);
@@ -72,6 +93,26 @@ package
 
 			button.downSkin = quad;
 			button.height = button.width = 45;
+		}
+
+		private function setMenuButtonStyles(button:Button):void
+		{
+			var skin:ImageLoader = new ImageLoader();
+			skin.source = EmbeddedAssets.menuButtonTexture;
+			skin.width = 250;
+			skin.height = 60;
+
+			var downSkin:ImageLoader = new ImageLoader();
+			downSkin.source = EmbeddedAssets.menuDownButtonTexture;
+			downSkin.width = 250;
+			downSkin.height = 60;
+
+			button.width = 250;
+			button.height = 60;
+			button.defaultSkin = skin;
+			button.upSkin = skin;
+			button.downSkin = downSkin;
+			button.fontStyles = new TextFormat("Play", 24, 0x3394DB, "left");
 		}
 
 		//-------------------------

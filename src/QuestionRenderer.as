@@ -31,7 +31,7 @@ package
 		private var botLabel:Label;
 		private var sourceGroup:LayoutGroup;
 		private var sourceLabel:Label;
-		private var grayOVerlay:BasicButton;
+		private var grayOverlay:BasicButton;
 		private var botButton:Button;
 		private var notbotButton:Button;
 		private var infoButton:Button;
@@ -103,10 +103,10 @@ package
 			infoButton.layoutData = new AnchorLayoutData(10, 10, NaN, NaN);
 			sourceGroup.addChild(infoButton);
 
-			grayOVerlay = new BasicButton();
-			grayOVerlay.layoutData = new AnchorLayoutData(0, 0, 0, 0);
-			grayOVerlay.defaultSkin = RoundedRect.createRoundedRect(0xCCCCCC);
-			sourceGroup.addChild(grayOVerlay);
+			grayOverlay = new BasicButton();
+			grayOverlay.layoutData = new AnchorLayoutData(0, 0, 0, 0);
+			grayOverlay.defaultSkin = RoundedRect.createRoundedRect(0xCCCCCC);
+			sourceGroup.addChild(grayOverlay);
 
 			/*
 			 Bottom group block
@@ -177,7 +177,7 @@ package
 			botButton.isEnabled = false;
 			notbotButton.isEnabled = false;
 
-			grayOVerlay.visible = false;
+			grayOverlay.visible = false;
 			infoButton.visible = true;
 
 			if (selectedAnswer === _data.bot) {
@@ -186,7 +186,10 @@ package
 				sourceLabel.fontStyles.color = BLUE;
 				sourceGroup.backgroundSkin = RoundedRect.createRoundedRect(BLUE);
 
-				var correctAnswerEvent:Event = new Event("submit-answer", true, {questionId: _data.id, correctAnswer:true});
+				var correctAnswerEvent:Event = new Event("submit-answer", true, {
+					questionId: _data.id,
+					correctAnswer: true
+				});
 				dispatchEvent(correctAnswerEvent);
 
 			} else {
@@ -203,7 +206,10 @@ package
 					sourceGroup.backgroundSkin = RoundedRect.createRoundedRect(RED);
 				}
 
-				var incorrectAnswerEvent:Event = new Event("submit-answer", true, {questionId: _data.id, correctAnswer:false});
+				var incorrectAnswerEvent:Event = new Event("submit-answer", true, {
+					questionId: _data.id,
+					correctAnswer: false
+				});
 				dispatchEvent(incorrectAnswerEvent);
 
 			}
@@ -213,18 +219,18 @@ package
 		override protected function commitData():void
 		{
 			if (this._data && this._owner) {
-				
+
 				botButton.isEnabled = true;
 				notbotButton.isEnabled = true;
 
 				/*
-				We reset everything to white
+				 We reset everything to white
 				 */
 				infoButton.visible = false;
 				botLabel.fontStyles.color = 0xFFFFFF;
 				sourceLabel.fontStyles.color = 0xFFFFFF;
 				sourceGroup.backgroundSkin = RoundedRect.createRoundedRect(0xFFFFFF);
-				grayOVerlay.visible = true;
+				grayOverlay.visible = true;
 				questionTextLabel.text = '"<i>' + _data.text + '"</i>';
 				sourceLabel.text = _data.source_short;
 

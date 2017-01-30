@@ -6,14 +6,12 @@ package
 
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
-
 	import flash.net.URLLoader;
-
 	import flash.net.URLRequest;
-
 	import flash.net.URLRequestHeader;
 	import flash.net.URLRequestMethod;
 
+	import screens.GameScreen;
 	import screens.HomeScreen;
 
 	import starling.display.Sprite;
@@ -25,6 +23,7 @@ package
 	{
 
 		private static const HOME_SCREEN:String = "homeScreen";
+		private static const GAME_SCREEN:String = "gameScreen";
 
 		private var myNavigator:StackScreenNavigator;
 
@@ -45,7 +44,12 @@ package
 			this.addChild(myNavigator);
 
 			var homeScreenItem:StackScreenNavigatorItem = new StackScreenNavigatorItem(HomeScreen);
+			homeScreenItem.setScreenIDForPushEvent(HomeScreen.GO_PLAY, GAME_SCREEN);
 			myNavigator.addScreen(HOME_SCREEN, homeScreenItem);
+
+			var gameScreenItem:StackScreenNavigatorItem = new StackScreenNavigatorItem(GameScreen);
+			gameScreenItem.addPopEvent(starling.events.Event.COMPLETE);
+			myNavigator.addScreen(GAME_SCREEN, gameScreenItem);
 
 			if (ProfileManager.isLoggedIn()) {
 
